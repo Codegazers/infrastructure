@@ -24,26 +24,30 @@ variable "address" {
 }
 
 variable "os_disk" {
-  type = "string"
-  description = "Size of the OS disk in bytes"
+  default = 2048
+  description = "Size of the OS disk in GB"
 }
 
 variable "data_disk" {
-  type = "string"
-  description = "Size of the data disk in bytes"
+  default = 1
+  description = "Size of the data disk in MB"
 }
 
 
 resource "libvirt_volume" "os_disk" {
   name = "${var.name}_os"
   pool = "vg0"
-  size = "${var.os_disk}"
+
+  # We have to use floor() here because pow() returns a float
+  size = "${var.os_disk * floor(pow(1024, 2))}"
 }
 
 resource "libvirt_volume" "data_disk" {
   name = "${var.name}_data"
   pool = "data"
-  size = "${var.data_disk}"
+
+  # We have to use floor() here because pow() returns a float
+  size = "${var.data_disk * floor(pow(1024, 2))}"
   format = "qcow2"
 
   lifecycle {
@@ -54,7 +58,7 @@ resource "libvirt_volume" "data_disk" {
 resource "libvirt_domain" "domain" {
   name = "${var.name}"
 
-  running   = false
+  running   = true
   autostart = false
 
   disk {
@@ -91,6 +95,7 @@ resource "libvirt_domain" "domain" {
     network_name = "${var.network_name}"
     addresses = ["${var.address}"]
     hostname  = "${var.name}"
+    wait_for_lease = true
   }
 
   vcpu  = "${var.cores}"
