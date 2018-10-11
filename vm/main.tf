@@ -25,7 +25,7 @@ variable "address" {
 
 variable "os_disk" {
   default = 2048
-  description = "Size of the OS disk in GB"
+  description = "Size of the OS disk in MB"
 }
 
 variable "data_disk" {
