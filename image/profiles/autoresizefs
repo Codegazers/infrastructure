@@ -1,0 +1,3 @@
+#!/bin/bash
+
+lvextend -r -l +100%FREE /dev/cloud-vg/root

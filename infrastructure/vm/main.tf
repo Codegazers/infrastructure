@@ -3,6 +3,11 @@ variable "network_name" {
   description = "Name of the network this machine should be in" 
 }
 
+variable "image" {
+  type = "string"
+  description = "Path to the installation image"
+}
+
 variable "name" {
   type = "string"
   description = "Name of the virtual machine"
@@ -21,6 +26,11 @@ variable "memory" {
 variable "address" {
   type = "string"
   description = "IP address"
+}
+
+variable "mac" {
+  type = "string"
+  description = "MAC address"
 }
 
 variable "os_disk" {
@@ -62,7 +72,7 @@ resource "libvirt_domain" "domain" {
   autostart = false
 
   disk {
-    file = "/home/tyrant/salt-minion-debian-preseed/images/debian-9.5-amd64-CD-1.iso"
+    file = "${var.image}"
   }
 
   disk {
@@ -95,6 +105,7 @@ resource "libvirt_domain" "domain" {
     network_name = "${var.network_name}"
     addresses = ["${var.address}"]
     hostname  = "${var.name}"
+    mac = "${var.mac}"
     wait_for_lease = true
   }
 

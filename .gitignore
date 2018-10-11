@@ -1,0 +1,4 @@
+image/images/
+image/tmp/
+.terraform
+terraform.tfstate.backup
