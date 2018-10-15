@@ -1,0 +1,5 @@
+#!/bin/bash
+
+IP_ADDR=$(sudo virsh domifaddr $1 | tail -n 2 |head -n1 | tr -s ' ' | cut -d' ' -f5 | cut -d'/' -f1)
+
+ssh root@$IP_ADDR
