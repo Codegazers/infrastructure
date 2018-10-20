@@ -95,9 +95,8 @@ resource "libvirt_domain" "domain" {
   }
 
   graphics {
-    type        = "spice"
+    type = "vnc"
     listen_type = "address"
-    autoport    = true
   }
 
   network_interface {
