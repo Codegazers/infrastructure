@@ -1,0 +1,11 @@
+[Unit]
+Description="Try to resize the disks to the size of their partitions"
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/preparedatadisk
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

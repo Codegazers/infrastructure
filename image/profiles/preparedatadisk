@@ -1,0 +1,20 @@
+#!/bin/bash -xe
+
+if [ ! -b "/dev/vdb" ]; then
+  # If there is no data disk attached, simply exit
+  echo "No data disk attached"
+  exit 0
+fi
+
+if [ -b "/dev/vdb1" ]; then
+  # If there is already a partition, simply exit
+  echo "Partition already exists"
+  exit 0
+fi
+
+# Create a full size GPT partition
+parted -s -a optimal /dev/vdb mklabel gpt
+parted -s -a optimal /dev/vdb mkpart primary 0% 100%
+
+# Format it to ext4
+mkfs.ext4 -L data /dev/vdb1
