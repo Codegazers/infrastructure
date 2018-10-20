@@ -1,5 +1,5 @@
 #!/bin/bash
 
-IP_ADDR=$(sudo virsh domifaddr $1 | tail -n 2 |head -n1 | tr -s ' ' | cut -d' ' -f5 | cut -d'/' -f1)
+IP_ADDR=$(sudo virsh domifaddr cloud | sed '3q;d' | awk '{print substr($4, 1, length($4)-3)}')
 
 ssh root@$IP_ADDR
