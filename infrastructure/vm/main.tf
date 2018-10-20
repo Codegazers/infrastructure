@@ -54,11 +54,10 @@ resource "libvirt_volume" "os_disk" {
 
 resource "libvirt_volume" "data_disk" {
   name = "${var.name}_data"
-  pool = "data"
+  pool = "vg0"
 
   # We have to use floor() here because pow() returns a float
   size = "${var.data_disk * floor(pow(1024, 2))}"
-  format = "qcow2"
 
   lifecycle {
     prevent_destroy = true
@@ -79,9 +78,9 @@ resource "libvirt_domain" "domain" {
     volume_id = "${libvirt_volume.os_disk.id}"
   }
 
-  #disk {
-  #  volume_id = "${libvirt_volume.data_disk.id}"
-  #}
+  disk {
+    volume_id = "${libvirt_volume.data_disk.id}"
+  }
 
   console {
     type        = "pty"
