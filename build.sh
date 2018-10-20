@@ -16,4 +16,3 @@ else
 fi
 
 build infrastructure $IMAGE_PATH
-build state
