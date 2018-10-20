@@ -32,8 +32,9 @@ d-i time/zone string Europe/Vienna
 d-i clock-setup/ntp boolean true
 
 # Partions Stuff
-#d-i partman-auto/disk string /dev/vda
+d-i partman-auto-lvm/guided_size string max
 d-i partman-auto/method string lvm
+d-i partman-auto/disk string /dev/vda
 d-i partman-lvm/device_remove_lvm boolean true
 d-i partman-lvm/confirm boolean true
 d-i partman-lvm/confirm_nooverwrite boolean true
@@ -51,12 +52,12 @@ d-i apt-setup/local0/repository string http://repo.saltstack.com/apt/debian/9/am
 
 # Install standard packages
 base-installer base-installer/install-recommends boolean true
-#d-i tasksel/first multiselect standard system utilities
-#d-i anna/standard_modules boolean true
 tasksel tasksel/first multiselect standard
 d-i apt-setup/use_mirror boolean true
 apt-setup-udeb apt-setup/services-select multiselect security, updates
-d-i pkgsel/include string salt-minion
+
+# Install required packages
+d-i pkgsel/include string salt-minion parted acpid
 
 # Upgrade packages after installation
 pkgsel pkgsel/upgrade select safe-upgrade
