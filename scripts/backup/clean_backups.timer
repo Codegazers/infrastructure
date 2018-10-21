@@ -1,0 +1,9 @@
+[Unit]
+Description=Clean up old backups
+
+[Timer]
+OnCalendar=monthly
+Persistent=true
+
+[Install]
+WantedBy=timers.target

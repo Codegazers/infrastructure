@@ -1,0 +1,9 @@
+[Unit]
+Description="Run backup scripts of VMs"
+
+[Service]
+Type=oneshot
+ExecStart=/home/vmbackup/backup.sh database mail git teamspeak
+WorkingDirectory=/home/vmbackup
+User=vmbackup
+Group=vmbackup

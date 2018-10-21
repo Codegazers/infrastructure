@@ -1,0 +1,9 @@
+[Unit]
+Description="Clean old backups"
+
+[Service]
+Type=oneshot
+ExecStart=/home/vmbackup/clean_backup.sh
+WorkingDirectory=/home/vmbackup
+User=vmbackup
+Group=vmbackup
