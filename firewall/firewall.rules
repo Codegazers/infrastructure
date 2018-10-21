@@ -18,22 +18,27 @@ COMMIT
 :DNAT-git - [0:0]
 :DNAT-mail - [0:0]
 :DNAT-web - [0:0]
+:DNAT-teamspeak - [0:0]
 :SNAT-git - [0:0]
 :SNAT-mail - [0:0]
 :SNAT-web - [0:0]
+:SNAT-teamspeak - [0:0]
 
 # DNAT Rules for VMs
 -A PREROUTING -d 176.9.48.29/32 -j DNAT-mail
 -A PREROUTING -d 176.9.48.29/32 -j DNAT-web
 -A PREROUTING -d 176.9.48.29/32 -j DNAT-git
+-A PREROUTING -d 176.9.48.29/32 -j DNAT-teamspeak
 -A OUTPUT -d 176.9.48.29/32 -j DNAT-mail
 -A OUTPUT -d 176.9.48.29/32 -j DNAT-web
 -A OUTPUT -d 176.9.48.29/32 -j DNAT-git
+-A OUTPUT -d 176.9.48.29/32 -j DNAT-teamspeak
 
 # SNAT Rules for VMs
 -A POSTROUTING -s 192.168.100.7/32 -d 192.168.100.7/32 -j SNAT-web
 -A POSTROUTING -s 192.168.100.8/32 -d 192.168.100.8/32 -j SNAT-git
 -A POSTROUTING -s 192.168.100.9/32 -d 192.168.100.9/32 -j SNAT-mail
+-A POSTROUTING -s 192.168.100.11/32 -d 192.168.100.11/32 -j SNAT-teamspeak
 
 # Broadcast addresses
 -A POSTROUTING -s 192.168.100.0/24 -d 224.0.0.0/24 -o eth0 -j RETURN
@@ -65,5 +70,11 @@ COMMIT
 -A SNAT-mail -s 192.168.100.9/32 -d 192.168.100.9/32 -p tcp -m tcp --dport 587 -j MASQUERADE
 -A SNAT-mail -s 192.168.100.9/32 -d 192.168.100.9/32 -p tcp -m tcp --dport 143 -j MASQUERADE
 -A SNAT-mail -s 192.168.100.9/32 -d 192.168.100.9/32 -p tcp -m tcp --dport 4190 -j MASQUERADE
+
+# teamspeak.vm
+-A DNAT-teamspeak -d 176.9.48.29/32 -p udp -m udp --dport 9987 -j DNAT --to-destination 192.168.100.11:9987
+-A DNAT-teamspeak -d 176.9.48.29/32 -p tcp -m tcp --dport 10011 -j DNAT --to-destination 192.168.100.11:10011
+-A SNAT-teamspeak -s 192.168.100.11/32 -d 192.168.100.11/32 -p udp -m udp --dport 9987 -j MASQUERADE
+-A SNAT-teamspeak -s 192.168.100.11/32 -d 192.168.100.11/32 -p tcp -m tcp --dport 10011 -j MASQUERADE
 
 COMMIT

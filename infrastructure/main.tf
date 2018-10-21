@@ -115,3 +115,18 @@ module "database_vm" {
   network_name = "${libvirt_network.default.name}"
   image        = "${var.image}"
 }
+
+module "teamspeak_vm" {
+  source = "./vm"
+
+  name      = "teamspeak"
+  cores     = 1
+  memory    = 512
+  address   = "192.168.100.11"
+  mac       = "86:12:DE:07:6E:FA"
+  os_disk   = "${10 * 1024}"
+  data_disk = "${5 * 1024}"
+
+  network_name = "${libvirt_network.default.name}"
+  image        = "${var.image}"
+}
