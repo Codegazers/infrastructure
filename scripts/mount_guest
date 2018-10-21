@@ -1,0 +1,6 @@
+#!/bin/bash
+
+GUEST=$1
+
+kpartx -a /dev/vg0/${GUEST}_osdisk
+vgscan
