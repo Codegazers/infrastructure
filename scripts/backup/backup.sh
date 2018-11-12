@@ -1,7 +1,7 @@
 #!/bin/bash
 
-MAIL_FROM=backup@nukularstrom.de
-MAIL_TO=tyrant@nukularstrom.de
+MAIL_FROM=backup@skyr.at
+MAIL_TO=fabian.schlager@skyr.at
 MAIL_VM=mail
 LOG_FILE=/tmp/backup.log
 GPG_RECIPIENT=tyrantcrp@gmail.com
@@ -76,6 +76,9 @@ for VM in "$@"; do
 
   rm $FILENAME.gpg
   rm $FILENAME
+
+  # Also remove temporary backup inside VM
+  run_cmd ssh -o StrictHostKeyChecking=no root@$IP_ADDR rm $TARGET
 
   log "Done!"
   log
