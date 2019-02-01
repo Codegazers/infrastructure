@@ -130,3 +130,18 @@ module "teamspeak_vm" {
   network_name = "${libvirt_network.default.name}"
   image        = "${var.image}"
 }
+
+module "calendar_vm" {
+  source = "./vm"
+
+  name      = "calendar"
+  cores     = 1
+  memory    = 512
+  address   = "192.168.100.12"
+  mac       = "86:1F:81:F2:8D:7E"
+  os_disk   = "${10 * 1024}"
+  data_disk = "${5 * 1024}"
+
+  network_name = "${libvirt_network.default.name}"
+  image        = "${var.image}"
+}
