@@ -3,7 +3,7 @@ Description="Run backup scripts of VMs"
 
 [Service]
 Type=oneshot
-ExecStart=/home/vmbackup/backup.sh database mail git teamspeak
+ExecStart=/home/vmbackup/backup.sh database mail git teamspeak calendar
 WorkingDirectory=/home/vmbackup
 User=vmbackup
 Group=vmbackup
