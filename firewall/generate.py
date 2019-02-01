@@ -34,10 +34,33 @@ COMMIT
 %RULES%
 
 COMMIT
+
+*filter
+%FILTER_CHAINS%
+
+-A INPUT -i virbr0 -p udp -m udp --dport 53 -j ACCEPT
+-A INPUT -i virbr0 -p tcp -m tcp --dport 53 -j ACCEPT
+-A INPUT -i virbr0 -p udp -m udp --dport 67 -j ACCEPT
+-A INPUT -i virbr0 -p tcp -m tcp --dport 67 -j ACCEPT
+
+-A FORWARD -d 192.168.100.0/24 -o virbr0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A FORWARD -s 192.168.100.0/24 -i virbr0 -j ACCEPT
+-A FORWARD -i virbr0 -o virbr0 -j ACCEPT
+-A OUTPUT -o virbr0 -p udp -m udp --dport 68 -j ACCEPT
+
+%FILTER_RULES%
+
+-A FORWARD -m limit --limit 2/min -j LOG --log-prefix "[FW] Dropped " --log-level 4
+
+-A FORWARD -o virbr0 -j REJECT --reject-with icmp-port-unreachable
+-A FORWARD -i virbr0 -j REJECT --reject-with icmp-port-unreachable
+
+COMMIT
 """
 
 vms = []
 vm_rules = []
+filter_rules = []
 
 parser = configparser.ConfigParser()
 parser.read(sys.argv[1])
@@ -54,7 +77,10 @@ for vm in parser:
 # Rules for {0}
 -A PREROUTING -d 176.9.48.29/32 -j DNAT-{0}
 -A OUTPUT -d 176.9.48.29/32 -j DNAT-{0}
--A POSTROUTING -s {1}/32 -d {1}/32 -j SNAT-{0}""".format(vm, vm_ip)
+-A POSTROUTING -s {1}/32 -d {1}/32 -j SNAT-{0}
+""".format(vm, vm_ip)
+
+    f_rules = "-A FORWARD -d {1}/32 -j FWD-{0}".format(vm, vm_ip)
 
     for src_port in vm_data:
         dest_port = vm_data[src_port]
@@ -64,26 +90,37 @@ for vm in parser:
             protocol = 'udp'
             src_port = src_port[1:]
 
-        rules += "-A DNAT-{0} -d 176.9.48.29/32 -p {4} -m {4} --dport {1} -j DNAT --to-destination {2}:{3}\n".format(
+        rules += "\n-A DNAT-{0} -d 176.9.48.29/32 -p {4} -m {4} --dport {1} -j DNAT --to-destination {2}:{3}\n".format(
                     vm,
                     src_port,
                     vm_ip,
                     dest_port,
                     protocol)
-        rules += "-A SNAT-{0} -s {1}/32 -d {1}/32 -p {3} -m {3} --dport {2} -j MASQUERADE".format(
+        rules += "\n-A SNAT-{0} -s {1}/32 -d {1}/32 -p {3} -m {3} --dport {2} -j MASQUERADE".format(
+                    vm,
+                    vm_ip,
+                    dest_port,
+                    protocol)
+        f_rules += "\n-A FWD-{0} -d {1}/32 -p {3} --dport {2} -j ACCEPT".format(
                     vm,
                     vm_ip,
                     dest_port,
                     protocol)
 
 
+
     vm_rules.append(rules)
+    filter_rules.append(f_rules)
 
 
 vm_chains = [
-    ":DNAT-{0} - [0:0]\n:SNAT-{0} - [0:0]".format(vm) for vm in vms
+        ":DNAT-{0} - [0:0]\n:SNAT-{0} - [0:0]".format(vm) for vm in vms
 ]
 
-out = HEADER.replace('%CHAINS%', '\n'.join(vm_chains)).replace('%RULES%', '\n'.join(vm_rules))
+filter_chains = [
+        ":FWD-{0} - [0:0]".format(vm) for vm in vms
+]
+
+out = HEADER.replace('%CHAINS%', '\n'.join(vm_chains)).replace('%FILTER_CHAINS%', '\n'.join(filter_chains)).replace('%RULES%', '\n'.join(vm_rules)).replace('%FILTER_RULES%', '\n'.join(filter_rules))
 print(out)
 
